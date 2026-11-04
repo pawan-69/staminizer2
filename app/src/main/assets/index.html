@@ -1,11 +1,2808 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#090d16">
+  <title>Staminizer</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #111827;
+      --card-sub: #162032;
+      --card-hover: #1e293b;
+      --border-color: #243044;
+      --border-focus: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #f43f5e;
+      --primary-hover: #e11d48;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --purple: #a855f7;
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 76px; /* Space for sticky bottom navigation bar */
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #070a10; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #e11d48; }
+
+    /* Hide scrollbar for sleek horizontal ribbons on Android */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* SVG Utility */
+    .icon {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      fill: currentColor;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    header {
+      background: rgba(17, 24, 39, 0.96);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+     f backdrop-filter: blur(10px);
+    }
+    .header-inner {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e11d48, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+      flex-shrink: 0;
+    }
+    .brand-text-col {
+      min-width: 0;
+      flex: 1;
+    }
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+    .folder-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      font-family: monospace;
+      background: rgba(16, 185, 129, 0.14);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 2px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .brand-sub {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .brand-sub.expanded {
+      white-space: normal;
+      line-height: 1.3;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+    .phone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 0.65rem;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .phone-badge:hover {
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .phone-badge span {
+      color: #fda4af;
+      font-family: monospace;
+      letter-spacing: 0.04em;
+    }
+    .desktop-only-actions {
+      display: none;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    @media (min-width: 900px) {
+      .desktop-only-actions {
+        display: flex;
+      }
+      .brand-title {
+        font-size: 1.4rem;
+      }
+      .brand-sub {
+        font-size: 0.73rem;
+        white-space: normal;
+      }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .btn-secondary {
+      background: #1e293b;
+      border-color: var(--border-color);
+      color: #e2e8f0;
+    }
+    .btn-secondary:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .btn-amber {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+    }
+    .btn-amber:hover {
+      background: rgba(245, 158, 11, 0.28);
+      border-color: #f59e0b;
+      color: #fff;
+    }
+    .btn-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
+    .btn-emerald:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: #10b981;
+      color: #fff;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Container */
+    main {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0.75rem 0.75rem 1.5rem;
+      width: 100%;
+      flex-grow: 1;
+    }
+    @media (min-width: 768px) {
+      main {
+        padding: 1.25rem 1rem;
+      }
+    }
+
+    /* Dedicated View Tabs Architecture (Strict Separation of Views) */
+    .app-view-section {
+      display: none;
+      animation: fadeInView 0.18s ease-out;
+    }
+    .app-view-section.active-view {
+      display: block;
+    }
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Day Selector Card - Sleek Horizontal Swipe on Android, 7-Grid on Desktop */
+    .day-selector-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.6rem 0.7rem;
+      margin-bottom: 0.65rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+    .day-selector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.45rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .day-grid {
+      display: flex;
+      gap: 0.45rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 2px;
+    }
+    @media (min-width: 900px) {
+      .day-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        overflow-x: visible;
+      }
+    }
+
+    .day-tab {
+      background: #090e17;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      min-width: 92px;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      cursor: pointer;
+      text-align: center;
+      position: relative;
+      transition: all 0.18s ease;
+      color: #cbd5e1;
+    }
+    @media (min-width: 900px) {
+      .day-tab {
+        min-width: 0;
+        padding: 0.6rem 0.4rem;
+      }
+    }
+    .day-tab:hover {
+      background: #162238;
+      border-color: #3b82f6;
+    }
+    .day-tab.active {
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      border-color: #fb7185;
+      color: #ffffff;
+      box-shadow: 0 3px 12px rgba(225, 29, 72, 0.4);
+    }
+    .day-tab-name {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: block;
+    }
+    .day-tab-count {
+      font-size: 0.66rem;
+      opacity: 0.88;
+      display: block;
+      margin-top: 1px;
+    }
+    .day-tab .active-dot {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+    .day-tab.active .active-dot {
+      background: #ffffff;
+    }
+
+    /* Filter & Search Bar - Compact & De-cluttered */
+    .filter-card {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 0.65rem 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+    .filter-controls-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+      flex-wrap: wrap;
+    }
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 160px;
+    }
+    .search-input {
+      background: #090e17;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 0.42rem 1.8rem 0.42rem 2rem;
+      font-size: 0.78rem;
+      color: #fff;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.65rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      color: #64748b;
+      pointer-events: none;
+    }
+    .clear-search-btn {
+      position: absolute;
+      right: 0.45rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      display: none;
+      padding: 2px;
+    }
+    .active-only-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #090e17;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 0.4rem 0.65rem;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .active-only-toggle.on {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* Horizontal Swipeable Filter Chips on Mobile */
+    .filter-chip-container {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scroll-snap-type: x mandatory;
+    }
+    @media (min-width: 900px) {
+      .filter-chip-container {
+        flex-wrap: wrap;
+        overflow-x: visible;
+      }
+    }
+    .filter-chip {
+      background: #090e17;
+      border: 1px solid var(--border-color);
+      color: #94a3b8;
+      padding: 0.35rem 0.7rem;
+      border-radius: 18px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+    }
+    .filter-chip:hover {
+      border-color: #64748b;
+      color: #fff;
+    }
+    .filter-chip.active {
+      background: #f43f5e;
+      color: #fff;
+      border-color: #fb7185;
+      box-shadow: 0 2px 8px rgba(244, 63, 94, 0.35);
+    }
+    .filter-chip .chip-count {
+      font-size: 0.64rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 1px 5px;
+      border-radius: 10px;
+    }
+
+    /* Overview Bar */
+    .overview-bar {
+      background: rgba(17, 24, 39, 0.65);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.8rem;
+      font-size: 0.74rem;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: rgba(225, 29, 72, 0.15);
+      color: #fda4af;
+      border: 1px solid rgba(225, 29, 72, 0.3);
+    }
+    .accordion-bulk-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .text-link-btn {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Muscle Columns Grid */
+    .muscle-columns-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+      align-items: start;
+    }
+    @media (min-width: 680px) {
+      .muscle-columns-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+    }
+    @media (min-width: 1080px) {
+      .muscle-columns-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    }
+
+    .muscle-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .muscle-card.has-active {
+      border-color: #3b82f6;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .muscle-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0.85rem;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(22, 32, 50, 0.45);
+      transition: background 0.15s ease;
+    }
+    .muscle-card-header:hover {
+      background: rgba(30, 41, 59, 0.7);
+    }
+    .muscle-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+    .muscle-icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--card-sub);
+      color: #fda4af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .muscle-card.has-active .muscle-icon-box {
+      background: rgba(244, 63, 94, 0.2);
+      color: #f43f5e;
+    }
+    .muscle-name {
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+    .muscle-subtitle {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+    .muscle-header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .active-count-pill {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: #1e293b;
+      color: #94a3b8;
+    }
+    .muscle-card.has-active .active-count-pill {
+      background: #e11d48;
+      color: #fff;
+    }
+    .chevron-icon {
+      transition: transform 0.2s ease;
+      color: #94a3b8;
+    }
+    .muscle-card.collapsed .chevron-icon {
+      transform: rotate(-90deg);
+    }
+    .muscle-card-body {
+      padding: 0.65rem 0.75rem 0.75rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .muscle-card.collapsed .muscle-card-body {
+      display: none;
+    }
+
+    /* Exercise List - Clean & Compact */
+    .exercise-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .exercise-row {
+      background: #090e17;
+      border: 1px solid var(--border-color);
+      border-radius: 9px;
+      padding: 0.5rem 0.65rem;
+      transition: all 0.15s ease;
+    }
+    .exercise-row.enabled {
+      background: #0f172a;
+      border-color: rgba(244, 63, 94, 0.55);
+      box-shadow: inset 3px 0 0 #f43f5e;
+    }
+    .exercise-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .exercise-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #94a3b8;
+      cursor: pointer;
+      user-select: none;
+      line-height: 1.3;
+      flex-grow: 1;
+      word-break: break-word;
+    }
+    .exercise-row.enabled .exercise-label {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Switch Toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .2s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #e11d48;
+    }
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    /* Sets & Reps Input Row - Hidden when disabled to eliminate Android clutter! */
+    .exercise-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.45rem;
+      padding-top: 0.45rem;
+      border-top: 1px dashed rgba(51, 65, 85, 0.7);
+    }
+    .exercise-controls.hidden-controls {
+      display: none;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex: 1;
+    }
+    .input-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .input-field {
+      width: 100%;
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 0.3rem 0.45rem;
+      font-size: 0.76rem;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+    }
+    .input-field.input-sets {
+      width: 52px;
+      text-align: center;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    /* Inline Custom Exercise Adder (No browser prompt() needed) */
+    .custom-add-wrap {
+      margin-top: 0.6rem;
+    }
+    .custom-add-form {
+      display: none;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+    .custom-add-form.show {
+      display: flex;
+    }
+    .btn-add-custom-bottom {
+      width: 100%;
+      padding: 0.42rem;
+      border-radius: 8px;
+      border: 1px dashed #334155;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+    }
+    .btn-add-custom-bottom:hover {
+      border-color: #64748b;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Member Profile Section */
+    .member-card {
+      margin-top: 0.25rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.15rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    }
+    .member-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.65rem;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .member-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+    }
+    @media (min-width: 900px) {
+      .member-grid {
+        grid-template-columns: 1.5fr 0.8fr 1fr 1fr 1.3fr 1.4fr;
+      }
+    }
+    .form-group.full-width-mobile {
+      grid-column: 1 / -1;
+    }
+    @media (min-width: 900px) {
+      .form-group.full-width-mobile {
+        grid-column: auto;
+      }
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.04em;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      background: #090e17;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 0.48rem 0.6rem;
+      font-size: 0.8rem;
+      color: #fff;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    /* Body Type Section Box */
+    .bodytype-guidance {
+      margin-top: 0.75rem;
+      background: #090e17;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .bodytype-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.22rem 0.55rem;
+      border-radius: 6px;
+      background: rgba(244, 63, 94, 0.15);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .bodytype-info-text {
+      font-size: 0.73rem;
+      color: #94a3b8;
+      flex: 1;
+      min-width: 220px;
+      line-height: 1.35;
+    }
+
+    /* Member Card Footer */
+    .member-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.85rem;
+      margin-top: 0.85rem;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    /* Android Sticky Bottom Navigation Bar */
+    .android-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 66px;
+      background: rgba(15, 23, 42, 0.98);
+      border-top: 1px solid #243044;
+      backdrop-filter: blur(12px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      z-index: 60;
+      padding: 0 0.25rem;
+      box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.5);
+    }
+    .nav-tab-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 4px 2px;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .nav-tab-btn.active-nav {
+      color: #ffffff;
+      background: rgba(244, 63, 94, 0.16);
+      border: 1px solid rgba(244, 63, 94, 0.4);
+    }
+    .nav-tab-btn:active {
+      background: rgba(255, 255, 255, 0.06);
+      transform: scale(0.95);
+    }
+    .nav-tab-btn.highlight-share {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 4.6rem;
+      right: 1rem;
+      left: 1rem;
+      max-width: 380px;
+      margin: 0 auto;
+      background: #111827;
+      border: 1px solid #f43f5e;
+      color: #fff;
+      padding: 0.7rem 1rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 110;
+    }
+    @media (min-width: 900px) {
+      #toast {
+        bottom: 1.5rem;
+        left: auto;
+        margin: 0;
+      }
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Modals (Weekly Summary & staminzer Folder Hub) */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 95;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+    }
+    .modal-backdrop.show {
+      display: flex;
+    }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 860px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+    }
+    .modal-box.compact-modal {
+      max-width: 500px;
+    }
+    .modal-header {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover {
+      color: #fff;
+    }
+    .modal-body {
+      padding: 1rem;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    .modal-footer {
+      padding: 0.7rem 1rem;
+      border-top: 1px solid var(--border-color);
+      background: #090e17;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+
+    /* staminzer Storage Option Cards */
+    .storage-option-card {
+      background: #090e17;
+      border: 1px solid #243044;
+      border-radius: 10px;
+      padding: 0.8rem;
+      margin-bottom: 0.65rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .storage-option-card:hover {
+      border-color: #f43f5e;
+      background: #0f172a;
+    }
+    .storage-opt-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .storage-opt-desc {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+    .folder-path-code {
+      font-family: monospace;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Rendered Card Image Preview for APK / WebView Long-Press & Direct Share */
+    .card-preview-frame {
+      background: #06090f;
+      border: 1px solid #243044;
+      border-radius: 10px;
+      padding: 0.6rem;
+      margin-top: 0.6rem;
+      text-align: center;
+    }
+    .card-preview-frame img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      display: block;
+      margin: 0 auto;
+      -webkit-touch-callout: default;
+      user-select: auto;
+    }
+    .quick-name-inline-input {
+      background: #090e17;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      width: 155px;
+      outline: none;
+      font-family: inherit;
+    }
+    .quick-name-inline-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* Footer */
+    footer {
+      background: #070a10;
+      border-top: 1px solid var(--border-color);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-size: 0.73rem;
+      color: var(--text-dim);
+    }
+    footer a {
+      color: #fda4af;
+      text-decoration: none;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    /* Print / PDF Formatting */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding-bottom: 0 !important;
+      }
+      header, footer, .app-view-section, .android-bottom-nav, #toast, .modal-backdrop, .no-print {
+        display: none !important;
+      }
+      #printContainer {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .print-card-box {
+        border: 1px solid #333333 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin-bottom: 12px !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        border-radius: 6px !important;
+        overflow: hidden !important;
+      }
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 11px !important;
+      }
+      th, td {
+        border-bottom: 1px solid #dddddd !important;
+        padding: 5px 8px !important;
+        color: #000000 !important;
+      }
+      th {
+        background: #f1f5f9 !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+      }
+    }
+
+    #printContainer {
+      display: none;
+    }
+  </style>
 </head>
-<body style="font-family: monospace">
-    REPLACE THIS FILE WITH YOUR OWN INDEX.HTML
+<body>
+
+  <!-- Header Bar -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <div class="brand-logo">
+          <svg class="icon" style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43L20.57 12L17 15.57L8.43 7L12 3.43L10.57 2L9.14 3.43L7.71 2L5.57 4.14L4.14 2.71L2.71 4.14L4.14 5.57L2 7.71L3.43 9.14L2 10.57L3.43 12L7 8.43L15.57 17L12 20.57L13.43 22L14.86 20.57L16.29 22L18.43 19.86L19.86 21.29L21.29 19.86L19.86 18.43L22 16.29L20.57 14.86Z"/></svg>
+        </div>
+        <div class="brand-text-col">
+          <div class="brand-title-row">
+            <h1 class="brand-title">STAMIN<span style="color:var(--primary);">IZER</span></h1>
+            <span class="folder-pill-badge" onclick="shareRoutineJPG()" title="Share Routine Card Directly">
+              <svg class="icon" style="width:11px; height:11px;" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+              Direct Share
+            </span>
+          </div>
+          <p class="brand-sub" onclick="this.classList.toggle('expanded')" title="Tap to expand full gym address">
+            Nazrul Ashrampara ,Near Maya Nursing Home,Opposite of Sunhill Portico , BEhind hotel dollin ,Siliguri 734001
+          </p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="tel:6296306487" class="phone-badge" title="Call Staminizer Gym">
+          <svg class="icon" style="width:13px; height:13px; color:#f43f5e;" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 3.76 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24c1.12.37 2.33.57 3.57.57c.55 0 1 .45 1 1V20c0 .55-.45 1-1 1c-9.39 0-17-7.61-17-17c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1c0 1.25.2 2.45.57 3.57c.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          <span>6296306487</span>
+        </a>
+
+        <!-- Desktop Action Buttons -->
+        <div class="desktop-only-actions">
+          <button onclick="clearCurrentDay()" class="btn btn-secondary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            Reset Day
+          </button>
+          <button onclick="shareRoutineJPG()" class="btn btn-emerald">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+            Share Routine Card
+          </button>
+          <button onclick="triggerNativePrint()" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1s1 .45 1 1s-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            Print / PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Work Area with Strictly Separated Views -->
+  <main>
+    <!-- =================================================================== -->
+    <!-- VIEW 1: WORKOUT BUILDER (EXERCISES ONLY - ZERO MEMBER INFO CLUTTER) -->
+    <!-- =================================================================== -->
+    <div id="viewWorkoutSection" class="app-view-section active-view">
+      <!-- Day Selector Ribbon (Swipeable on Android) -->
+      <section class="day-selector-card">
+        <div class="day-selector-header">
+          <span style="display:flex; align-items:center; gap:5px;">
+            <svg class="icon" style="color:var(--primary); width:13px; height:13px;" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+            Select Workout Day
+          </span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span id="activeDayStats" style="color:#34d399; font-weight:800;">0 active</span>
+            <button onclick="clearCurrentDay()" class="text-link-btn" style="color:#fda4af; text-decoration:none; font-size:0.68rem;">Reset Day</button>
+          </div>
+        </div>
+        <div class="day-grid no-scrollbar" id="dayTabsContainer"></div>
+      </section>
+
+      <!-- Target Body Part Filter & Search Bar -->
+      <section class="filter-card">
+        <div class="filter-controls-top">
+          <div class="search-input-wrap">
+            <svg class="icon search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="exerciseSearchInput" class="search-input" placeholder="Search exercise name..." oninput="onSearchExercises(this.value)">
+            <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearchInput()">
+              <svg class="icon" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+          </div>
+          <button id="activeOnlyBtn" class="active-only-toggle" onclick="toggleShowActiveOnly()">
+            <svg class="icon" style="width:13px; height:13px;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Selected Only
+          </button>
+        </div>
+        <div class="filter-chip-container no-scrollbar" id="filterChipContainer"></div>
+      </section>
+
+      <!-- Overview Bar -->
+      <div class="overview-bar">
+        <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;">
+          <span style="color:var(--text-muted);">Focus (<b id="currentDayNameLabel" style="color:#fda4af; text-transform:uppercase;">Monday</b>):</span>
+          <span id="dayTargetBadges" style="display:inline-flex; gap:4px; flex-wrap:wrap;"></span>
+        </div>
+        <div class="accordion-bulk-actions">
+          <button class="text-link-btn" onclick="setAllAccordions(false)">Expand All</button>
+          <span style="color:#334155;">|</span>
+          <button class="text-link-btn" onclick="setAllAccordions(true)">Collapse All</button>
+        </div>
+      </div>
+
+      <!-- Muscle Columns Grid (Collapsible Accordions) -->
+      <div class="muscle-columns-grid" id="muscleGroupsGrid"></div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 2: DEDICATED MEMBER DETAILS SECTION (SEPARATE FROM EXERCISES)  -->
+    <!-- =================================================================== -->
+    <div id="viewMemberSection" class="app-view-section">
+      <section class="member-card" id="memberProfileSection">
+        <div class="member-card-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.9rem;" id="memberAvatarInitials">
+              AV
+            </div>
+            <div>
+              <h3 style="font-size:0.95rem; font-weight:800; text-transform:uppercase;">Member Details & Somatotype</h3>
+              <p style="font-size:0.72rem; color:var(--text-muted);">Dedicated member profile stamped onto shared routine cards</p>
+            </div>
+          </div>
+          <div style="font-size:0.75rem; color:#fda4af; font-family:monospace; font-weight:700;">STAMINIZER GYM : 6296306487</div>
+        </div>
+
+        <div class="member-grid">
+          <div class="form-group full-width-mobile">
+            <label>Member's Name</label>
+            <input type="text" id="member_name" value="Alex Vance" placeholder="Enter Member's Name" oninput="persistData(); updateMemberBadges();">
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="member_age" value="26" placeholder="Years" oninput="persistData()">
+          </div>
+          <div class="form-group">
+            <label>Height</label>
+            <input type="text" id="member_height" value="5 ft 10 in" placeholder="e.g. 5'10 / 178cm" oninput="persistData()">
+          </div>
+          <div class="form-group">
+            <label>Weight</label>
+            <input type="text" id="member_weight" value="78 kg" placeholder="e.g. 78 kg" oninput="persistData()">
+          </div>
+          <div class="form-group full-width-mobile">
+            <label>Body Type (Somatotype)</label>
+            <select id="member_bodytype" onchange="onBodyTypeChanged()">
+              <option value="Mesomorph">Mesomorph (Athletic & Muscular)</option>
+              <option value="Ectomorph">Ectomorph (Lean & Fast Metabolism)</option>
+              <option value="Endomorph">Endomorph (Solid & Slower Metabolism)</option>
+            </select>
+          </div>
+          <div class="form-group full-width-mobile">
+            <label>Primary Goal</label>
+            <select id="member_goal" onchange="persistData()">
+              <option value="Hypertrophy (Muscle Gain)">Hypertrophy (Muscle Gain)</option>
+              <option value="Max Strength & Power">Max Strength & Power</option>
+              <option value="Fat Loss & Lean Definition">Fat Loss & Lean Definition</option>
+              <option value="Endurance & Conditioning">Endurance & Conditioning</option>
+              <option value="Athletic Performance">Athletic Performance</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Somatotype Specific Insight Box -->
+        <div class="bodytype-guidance">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="bodytype-badge" id="bodyTypeBadge">
+              <svg class="icon" style="width:12px; height:12px;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span id="badgeTypeName">Mesomorph</span>
+            </span>
+            <span style="font-size:0.75rem; font-weight:700; color:#fff;">Physique Directive:</span>
+          </div>
+          <div class="bodytype-info-text" id="bodyTypeTip">
+            Naturally athletic response: Respond best to progressive overload, moderate-to-heavy hypertrophy splits, and balanced macronutrient distribution.
+          </div>
+        </div>
+
+        <div class="member-card-footer">
+          <div style="font-size:0.73rem; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+            <svg class="icon" style="color:#10b981; width:14px; height:14px;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Member details auto-saved offline
+          </div>
+
+          <div class="action-group">
+            <button onclick="switchAppView('workout')" class="btn btn-secondary">Back to Exercises</button>
+            <button onclick="switchAppView('summary')" class="btn btn-amber">Review Weekly Split</button>
+            <button onclick="shareRoutineJPG()" class="btn btn-emerald">Share Routine Card</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 3: WEEKLY SUMMARY & DIRECT SHARE HUB                           -->
+    <!-- =================================================================== -->
+    <div id="viewSummarySection" class="app-view-section">
+      <div class="member-card" style="margin-top:0.25rem;">
+        <div class="member-card-header">
+          <div>
+            <h3 style="font-size:0.95rem; font-weight:800; text-transform:uppercase; color:#fff;">Weekly Split & Direct JPG Share Hub</h3>
+            <p style="font-size:0.72rem; color:var(--text-muted);">Share the actual .JPG Routine Image to WhatsApp or save to gallery</p>
+          </div>
+          <div class="action-group">
+            <button onclick="shareRoutineJPG()" class="btn btn-emerald">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+              Share JPG to WhatsApp
+            </button>
+            <button onclick="downloadNativeJPG()" class="btn btn-amber">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download JPG
+            </button>
+            <button onclick="triggerNativePrint()" class="btn btn-primary">
+              Print / PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Rendered JPG Card at the Top for Instant Visual & Long-Press Share -->
+        <div class="card-preview-frame" style="margin-bottom:1.2rem; margin-top:0.2rem;">
+          <div style="font-size:0.75rem; color:#34d399; margin-bottom:0.5rem; font-weight:800;">
+            🖼️ Generated JPG Routine Card (Tap "Share JPG to WhatsApp" or Long-Press Image -> Share Image):
+          </div>
+          <img id="inlineSummaryCardImg" alt="Member Routine Card" src="" />
+        </div>
+
+        <!-- Formatted Weekly HTML Table Summary -->
+        <div id="inlineWeeklySummaryContainer"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Android Sticky Bottom Navigation Bar (Strictly Separates Sections + 1-Tap Direct Share) -->
+  <nav class="android-bottom-nav no-print">
+    <button id="bottomNavWorkout" class="nav-tab-btn active-nav" onclick="switchAppView('workout')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M20.57 14.86L22 13.43L20.57 12L17 15.57L8.43 7L12 3.43L10.57 2L9.14 3.43L7.71 2L5.57 4.14L4.14 2.71L2.71 4.14L4.14 5.57L2 7.71L3.43 9.14L2 10.57L3.43 12L7 8.43L15.57 17L12 20.57L13.43 22L14.86 20.57L16.29 22L18.43 19.86L19.86 21.29L21.29 19.86L19.86 18.43L22 16.29L20.57 14.86Z"/></svg>
+      <span>Exercises</span>
+    </button>
+    <button id="bottomNavMember" class="nav-tab-btn" onclick="switchAppView('member')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span>Member Info</span>
+    </button>
+    <button id="bottomNavSummary" class="nav-tab-btn" onclick="switchAppView('summary')">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+      <span>Split Card</span>
+    </button>
+    <button class="nav-tab-btn highlight-share" onclick="shareRoutineJPG()">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+      <span>Share JPG</span>
+    </button>
+  </nav>
+
+  <!-- Direct JPG Image Share & Download Hub Modal -->
+  <div class="modal-backdrop" id="staminzerExportModal">
+    <div class="modal-box compact-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg class="icon" style="color:#34d399;" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          JPG Routine Card (<span id="exportMemberNameLabel" style="color:#fda4af;">Alex Vance</span>)
+        </div>
+        <button class="modal-close" onclick="closeStaminzerExportModal()">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Primary Action 1: Native Image File Share (Sends ONLY .JPG to WhatsApp, zero text) -->
+        <div class="storage-option-card" style="border-color:rgba(16,185,129,0.55);" onclick="forceShareImageFileOnly()">
+          <div>
+            <div class="storage-opt-title">
+              <svg class="icon" style="color:#34d399;" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+              Share .JPG Picture to WhatsApp
+            </div>
+            <div class="storage-opt-desc">
+              Sends the actual <span class="folder-path-code" id="previewJpgFileName">staminzer.jpg</span> image file via Android Share Sheet.
+            </div>
+          </div>
+          <span class="btn btn-emerald" style="padding:0.45rem 0.75rem;">Share JPG</span>
+        </div>
+
+        <!-- Primary Action 2: Blob / APK Bridge JPG Download -->
+        <div class="storage-option-card" style="border-color:rgba(245,158,11,0.55);" onclick="downloadNativeJPG()">
+          <div>
+            <div class="storage-opt-title">
+              <svg class="icon" style="color:#fbbf24;" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download .JPG to Phone
+            </div>
+            <div class="storage-opt-desc">
+              Saves high-res JPG workout card to your device Gallery / <span class="folder-path-code">Pictures/staminzer</span>.
+            </div>
+          </div>
+          <span class="btn btn-amber" style="padding:0.45rem 0.75rem;">Save JPG</span>
+        </div>
+
+        <!-- Live Rendered Image Preview (100% Guaranteed Long-Press Share in any APK WebView) -->
+        <div class="card-preview-frame">
+          <div style="font-size:0.73rem; color:#fde047; margin-bottom:0.45rem; font-weight:700; line-height:1.35;">
+            📲 <b>Guaranteed APK Image Share:</b> If your current APK wrapper blocks buttons, <b>press and hold (long-press) the image below</b> and tap <b>"Share image"</b> — it sends the JPG directly to WhatsApp!
+          </div>
+          <img id="liveGeneratedCardImg" alt="Staminizer Member Workout Card" src="" />
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <button class="btn btn-secondary" style="font-size:0.68rem;" onclick="closeStaminzerExportModal(); triggerNativePrint();">Save as PDF</button>
+        <button class="btn btn-secondary" onclick="closeStaminzerExportModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Print Container for Native Print / PDF -->
+  <div id="printContainer"></div>
+
+  <!-- Toast Element -->
+  <div id="toast">
+    <svg class="icon" style="color:#f43f5e;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Staminizer • Media Folder: <b style="color:#34d399; font-family:monospace;">staminzer/</b> • Phone no: <a href="tel:6296306487">6296306487</a>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // Master Muscle Groups & Full Exercise Catalog
+    const MUSCLE_GROUPS = [
+      {
+        id: "chest",
+        name: "Chest",
+        svgPath: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12c5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z",
+        defaultExercises: [
+          { name: "Flat Bench Press (Barbell / Dumbbell / Smith)", sets: 4, reps: "8-10" },
+          { name: "Incline Bench Press (Barbell / DB / Smith)", sets: 4, reps: "8-10" },
+          { name: "Decline Bench Press (Barbell / Dumbbell)", sets: 3, reps: "10-12" },
+          { name: "Flat Bench Fly (Dumbbell / Cable)", sets: 3, reps: "12-15" },
+          { name: "Incline Fly (Dumbbell)", sets: 3, reps: "12-15" },
+          { name: "Decline Fly (Dumbbell)", sets: 3, reps: "12-15" },
+          { name: "Machine Chest Press (Flat / Incline)", sets: 3, reps: "10-12" },
+          { name: "Pec Deck Fly / Butterfly Machine", sets: 3, reps: "12-15" },
+          { name: "Cable Crossover (High-to-Low / Low-to-High)", sets: 3, reps: "15" },
+          { name: "Hex Press", sets: 3, reps: "10-12" },
+          { name: "Pullover (DB / Barbell / Cable / Cross)", sets: 3, reps: "12" },
+          { name: "Push-ups (Standard / DB / Decline / Wall / Diamond)", sets: 3, reps: "15-20" },
+          { name: "Chest Dips / Parallel Bar / DB Floor Dips", sets: 3, reps: "To Failure" }
+        ]
+      },
+      {
+        id: "back",
+        name: "Back",
+        svgPath: "M21.71 20.29L20.29 21.71A1 1 0 0 1 18.88 21.71L12 14.83L5.12 21.71A1 1 0 0 1 3.71 20.29L10.59 13.41L2.29 5.12A1 1 0 0 1 3.71 3.71L12 12L20.29 3.71A1 1 0 0 1 21.71 5.12L13.41 13.41L21.71 20.29Z",
+        defaultExercises: [
+          { name: "Lat Pulldown (Standard / Wide / Close / Reverse)", sets: 4, reps: "10-12" },
+          { name: "Pull-ups / Chin-ups (Bodyweight / Assisted / Door-ups)", sets: 3, reps: "To Failure" },
+          { name: "Seated Cable Row / Seated Pulley (Close / Wide)", sets: 3, reps: "10-12" },
+          { name: "One-Arm Dumbbell Row / Pulley Row", sets: 3, reps: "10-12" },
+          { name: "Unilateral Cable Row (Bench-Supported)", sets: 3, reps: "12" },
+          { name: "Bent-Over Row (Barbell / Dumbbell)", sets: 4, reps: "8-10" },
+          { name: "T-Bar Row", sets: 4, reps: "8-10" },
+          { name: "Chest-Supported Row / Machine Row", sets: 3, reps: "10-12" },
+          { name: "Straight-Arm Pulldown", sets: 3, reps: "12-15" },
+          { name: "Deadlift (Conventional / Rack Pull)", sets: 4, reps: "5-8" },
+          { name: "Hyperextensions (Back Extensions)", sets: 3, reps: "15" }
+        ]
+      },
+      {
+        id: "shoulders",
+        name: "Shoulders & Traps",
+        svgPath: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8s8 3.58 8 8s-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6s6-2.69 6-6s-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4s4 1.79 4 4s-1.79 4-4 4z",
+        defaultExercises: [
+          { name: "Overhead / Shoulder Press (Barbell / DB / Machine / Smith)", sets: 4, reps: "8-10" },
+          { name: "Military Press", sets: 4, reps: "8-10" },
+          { name: "Side Dumbbell Press (Seated / Standing)", sets: 3, reps: "10-12" },
+          { name: "Behind-the-Neck / Back Press", sets: 3, reps: "10" },
+          { name: "Arnold Press", sets: 3, reps: "10-12" },
+          { name: "Landmine Press", sets: 3, reps: "10-12" },
+          { name: "Lateral Raises (DB / Cable / Machine / Seated)", sets: 4, reps: "12-15" },
+          { name: "Front Raises (DB / Barbell / Cable / Seated)", sets: 3, reps: "12-15" },
+          { name: "Rear Delt Fly / Reverse Pec Deck", sets: 4, reps: "15" },
+          { name: "Face Pull (Cable / Rope)", sets: 4, reps: "15" },
+          { name: "Upright Rows (Barbell / Cable)", sets: 3, reps: "10-12" },
+          { name: "Shrugs (Barbell / Dumbbell / Weighted)", sets: 4, reps: "12-15" }
+        ]
+      },
+      {
+        id: "biceps",
+        name: "Biceps",
+        svgPath: "M13 2.05v3.03c3.39.49 6 3.39 6 6.92c0 .9-.18 1.75-.48 2.54l2.6 1.53c.56-1.24.88-2.62.88-4.07c0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7c0-3.53 2.61-6.43 6-6.92V2.05c-5.06.5-9 4.76-9 9.95c0 5.52 4.47 10 9.99 10c3.31 0 6.24-1.61 8.01-4.09l-2.45-1.45C16.2 17.84 14.25 19 12 19z",
+        defaultExercises: [
+          { name: "Barbell Bicep Curl (Straight Bar / EZ-Bar)", sets: 3, reps: "10-12" },
+          { name: "Dumbbell Bicep Curl (Alternating / Seated / Standing)", sets: 3, reps: "10-12" },
+          { name: "Incline Dumbbell Curl", sets: 3, reps: "12" },
+          { name: "Preacher Curl (Straight / EZ-Bar / Machine)", sets: 3, reps: "10-12" },
+          { name: "Concentration Curl", sets: 3, reps: "12" },
+          { name: "Hammer Curl (DB / Cross-Body / Rope Cable)", sets: 3, reps: "12-15" },
+          { name: "Cable / Pulley Bicep Curl (Standard / Bayesian)", sets: 3, reps: "12-15" },
+          { name: "Spider Curl", sets: 3, reps: "10-12" },
+          { name: "Machine Bicep Curl", sets: 3, reps: "12" },
+          { name: "Reverse Curl (Barbell / Dumbbell / Cable Pulley)", sets: 3, reps: "12-15" }
+        ]
+      },
+      {
+        id: "triceps",
+        name: "Triceps",
+        svgPath: "M7 2v11h3v9l7-12h-4l4-8z",
+        defaultExercises: [
+          { name: "Triceps Pushdown / Pulley (Straight-Bar / Rope / Rev / Single)", sets: 4, reps: "12-15" },
+          { name: "Close-Grip Bench Press", sets: 3, reps: "8-10" },
+          { name: "Lying Triceps Extension / Skull Crushers (DB / EZ-Bar)", sets: 3, reps: "10-12" },
+          { name: "French Press", sets: 3, reps: "10-12" },
+          { name: "Overhead Extension (DB / Cable / Single-Arm / Flat)", sets: 3, reps: "12" },
+          { name: "Triceps Kickbacks (Dumbbell / Cable)", sets: 3, reps: "12-15" },
+          { name: "Triceps Dips / Bench Dips / Back Dips", sets: 3, reps: "15" },
+          { name: "Machine Triceps Extension", sets: 3, reps: "12" }
+        ]
+      },
+      {
+        id: "forearms",
+        name: "Forearms & Grip",
+        svgPath: "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z",
+        defaultExercises: [
+          { name: "Wrist Curl (Barbell / DB / Cable / Behind-the-Back)", sets: 3, reps: "15-20" },
+          { name: "Reverse Wrist Curl (Barbell / DB)", sets: 3, reps: "15-20" },
+          { name: "Farmer's Walk (Heavy Dumbbells / Trap Bar)", sets: 3, reps: "45 sec" },
+          { name: "Dead Hang (Pull-up Bar)", sets: 3, reps: "45-60 sec" },
+          { name: "Plate Pinch Hold", sets: 3, reps: "30-45 sec" },
+          { name: "Hand Gripper Squeezes", sets: 3, reps: "20 per hand" }
+        ]
+      },
+      {
+        id: "legs",
+        name: "Legs & Glutes",
+        svgPath: "M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2s-2 .9-2 2s.9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8l2.1 2v6h2v-7.5l-2.1-2l.6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1c-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z",
+        defaultExercises: [
+          { name: "Back Squat (Barbell / Smith Machine)", sets: 4, reps: "8-10" },
+          { name: "Front Squat", sets: 4, reps: "8-10" },
+          { name: "Sumo Squat (Barbell / Dumbbell)", sets: 3, reps: "10-12" },
+          { name: "Goblet Squat & Bodyweight Free Squat", sets: 3, reps: "12-15" },
+          { name: "Hack Squat & Sissy Squat", sets: 3, reps: "10-12" },
+          { name: "Wall Sit", sets: 3, reps: "45-60 sec" },
+          { name: "Leg Press (Standard / Wide / Close-Stance)", sets: 4, reps: "12" },
+          { name: "Leg Extension", sets: 3, reps: "12-15" },
+          { name: "Leg Curl (Lying / Seated / Standing)", sets: 3, reps: "12-15" },
+          { name: "Lunges (Walking / Standing / Reverse)", sets: 3, reps: "12 each leg" },
+          { name: "Bulgarian Split Squat & Split Squat", sets: 3, reps: "10 each leg" },
+          { name: "Romanian Deadlift (RDL) (Barbell / DB / Single-Leg)", sets: 4, reps: "10" },
+          { name: "Stiff-Leg Deadlift & Good Mornings", sets: 3, reps: "10-12" },
+          { name: "Nordic Hamstring Curl & Glute-Ham Raise", sets: 3, reps: "8-10" },
+          { name: "Cable Pull-Through", sets: 3, reps: "12-15" },
+          { name: "Hip Thrust (Barbell / Dumbbell)", sets: 4, reps: "10-12" },
+          { name: "Glute Bridge (Standard / Single-Leg / Marches)", sets: 3, reps: "15" },
+          { name: "Glute Kickback (Cable / Machine)", sets: 3, reps: "15 each" },
+          { name: "Hip Abduction (Machine / Cable)", sets: 3, reps: "15-20" },
+          { name: "Frog Pumps", sets: 3, reps: "25" },
+          { name: "Calf Raises (Standing / Seated / Machine / Leg Press / Single)", sets: 4, reps: "15-20" }
+        ]
+      },
+      {
+        id: "core",
+        name: "Abs & Core",
+        svgPath: "M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z",
+        defaultExercises: [
+          { name: "Crunches (Floor / Cable / Reverse / Bicycle / Seated)", sets: 3, reps: "20-25" },
+          { name: "Sit-Ups (Floor / Bench / Machine Lever)", sets: 3, reps: "15-20" },
+          { name: "Leg Raises (Hanging Leg / Knee / Floor / Side)", sets: 3, reps: "15-20" },
+          { name: "Knee-to-Elbow / Knee Touch Abs", sets: 3, reps: "20" },
+          { name: "Bench Jack Knife", sets: 3, reps: "15" },
+          { name: "V-Ups & Flutter Kicks", sets: 3, reps: "20" },
+          { name: "Plank (Standard / Side Plank)", sets: 3, reps: "60 sec" },
+          { name: "Russian Twist (Bodyweight / Plate)", sets: 3, reps: "20" },
+          { name: "Plate Side Bends", sets: 3, reps: "15 each side" },
+          { name: "Torso Rotation / Machine Twisting", sets: 3, reps: "15 per side" },
+          { name: "Cable Woodchopper", sets: 3, reps: "15 each side" },
+          { name: "Floor Wipers", sets: 3, reps: "15" },
+          { name: "Floor Heel Touches", sets: 3, reps: "25" },
+          { name: "Ab Wheel Rollout", sets: 3, reps: "12-15" },
+          { name: "Core Stability Holds (Dead Bug / Bird Dog / Pallof / Toe Touches)", sets: 3, reps: "12-15" }
+        ]
+      },
+      {
+        id: "cardio",
+        name: "Cardio & Conditioning",
+        svgPath: "M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2s-2 .9-2 2s.9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8l2.1 2v6h2v-7.5l-2.1-2l.6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1c-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z",
+        defaultExercises: [
+          { name: "Full Body Dynamic Stretching", sets: 1, reps: "10 min" },
+          { name: "Treadmill (Incline Walk / Running / Calorie Burn)", sets: 1, reps: "15-20 min" },
+          { name: "Stationary Cycling", sets: 1, reps: "15 min" },
+          { name: "Jump Rope / Skipping", sets: 3, reps: "2 min" },
+          { name: "Jumping Jacks & High Knees", sets: 3, reps: "45 sec" },
+          { name: "Mountain Climbers", sets: 3, reps: "40 sec" },
+          { name: "Battle Ropes", sets: 4, reps: "30 sec" },
+          { name: "Kettlebell Swings / Exercises", sets: 3, reps: "15-20" },
+          { name: "Slam Ball", sets: 3, reps: "15" },
+          { name: "Step-Ups, Step Jumps & Frog Jumping", sets: 3, reps: "20" },
+          { name: "Burpees", sets: 3, reps: "12-15" }
+        ]
+      }
+    ];
+
+    const DAYS = [
+      { id: "mon", name: "Monday", short: "MON" },
+      { id: "tue", name: "Tuesday", short: "TUE" },
+      { id: "wed", name: "Wednesday", short: "WED" },
+      { id: "thu", name: "Thursday", short: "THU" },
+      { id: "fri", name: "Friday", short: "FRI" },
+      { id: "sat", name: "Saturday", short: "SAT" },
+      { id: "sun", name: "Sunday", short: "SUN" }
+    ];
+
+    const SOMATOTYPE_GUIDELINES = {
+      "Mesomorph": {
+        badge: "Mesomorph",
+        advice: "Naturally athletic response: Respond best to progressive overload, moderate-to-heavy hypertrophy splits (8-12 reps), and balanced macronutrient distribution with regular deloads."
+      },
+      "Ectomorph": {
+        badge: "Ectomorph",
+        advice: "Fast metabolic rate & lean build: Prioritize compound heavy movements (6-10 reps), extended rest periods (2-3 min), strict calorie surplus with high complex carbs & protein."
+      },
+      "Endomorph": {
+        badge: "Endomorph",
+        advice: "Higher body fat tendency & solid bone structure: Thrive on high volume hypertrophy (10-15 reps), shorter rest intervals (45-60s), integrated HIIT/cardio, and lower carbohydrate intake."
+      }
+    };
+
+    let currentDayId = "mon";
+    let selectedMuscleFilter = "all";
+    let showActiveOnly = false;
+    let routineData = {};
+    let customExercises = {};
+    let searchQuery = "";
+    let collapsedMuscles = {}; // Keeps Android screen clutter-free
+    let currentAppView = "workout"; // 'workout' | 'member' | 'summary'
+
+    function switchAppView(viewName) {
+      currentAppView = viewName;
+
+      // Toggle main sections
+      document.getElementById('viewWorkoutSection').classList.toggle('active-view', viewName === 'workout');
+      document.getElementById('viewMemberSection').classList.toggle('active-view', viewName === 'member');
+      document.getElementById('viewSummarySection').classList.toggle('active-view', viewName === 'summary');
+
+      // Update Bottom Nav buttons
+      document.getElementById('bottomNavWorkout').classList.toggle('active-nav', viewName === 'workout');
+      document.getElementById('bottomNavMember').classList.toggle('active-nav', viewName === 'member');
+      document.getElementById('bottomNavSummary').classList.toggle('active-nav', viewName === 'summary');
+
+      if (viewName === 'summary') {
+        renderInlineSummaryView();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderInlineSummaryView() {
+      const container = document.getElementById('inlineWeeklySummaryContainer');
+      if (container) {
+        container.innerHTML = generateWeeklySummaryHTML();
+      }
+      try {
+        const { canvas } = buildWorkoutCanvas();
+        const img = document.getElementById('inlineSummaryCardImg');
+        if (img) img.src = canvas.toDataURL('image/jpeg', 0.95);
+      } catch (e) {}
+    }
+
+    function initApp() {
+      const savedRoutine = localStorage.getItem("staminizer_routine_offline");
+      const savedCustom = localStorage.getItem("staminizer_custom_offline");
+      const savedMember = localStorage.getItem("staminizer_member_offline");
+
+      if (savedCustom) {
+        try { customExercises = JSON.parse(savedCustom); } catch (e) { customExercises = {}; }
+      }
+
+      if (savedRoutine) {
+        try { routineData = JSON.parse(savedRoutine); } catch (e) { routineData = {}; }
+      } else {
+        buildDefaultRoutine();
+      }
+
+      if (savedMember) {
+        try {
+          const m = JSON.parse(savedMember);
+          if (m.name) document.getElementById('member_name').value = m.name;
+          if (m.age) document.getElementById('member_age').value = m.age;
+          if (m.height) document.getElementById('member_height').value = m.height;
+          if (m.weight) document.getElementById('member_weight').value = m.weight;
+          if (m.bodytype) document.getElementById('member_bodytype').value = m.bodytype;
+          if (m.goal) document.getElementById('member_goal').value = m.goal;
+        } catch (e) {}
+      }
+
+      DAYS.forEach(d => {
+        if (!routineData[d.id]) routineData[d.id] = {};
+        MUSCLE_GROUPS.forEach(m => {
+          if (!routineData[d.id][m.id]) routineData[d.id][m.id] = {};
+        });
+      });
+
+      syncAccordionDefaultsForDay();
+      onBodyTypeChanged();
+      updateMemberBadges();
+      renderDayTabs();
+      renderFilterChips();
+      renderMuscleColumns();
+      updateDayHeaderSummary();
+    }
+
+    // On Android/mobile, auto-expand muscle groups that have active exercises on the current day, collapse idle ones
+    function syncAccordionDefaultsForDay() {
+      const isMobile = window.innerWidth < 900;
+      collapsedMuscles = {};
+      MUSCLE_GROUPS.forEach((m, idx) => {
+        const mEx = routineData[currentDayId]?.[m.id] || {};
+        const hasActive = Object.values(mEx).some(x => x.enabled);
+        if (isMobile) {
+          collapsedMuscles[m.id] = !hasActive && idx > 0;
+        } else {
+          collapsedMuscles[m.id] = false;
+        }
+      });
+    }
+
+    function setAllAccordions(collapse) {
+      MUSCLE_GROUPS.forEach(m => {
+        collapsedMuscles[m.id] = collapse;
+      });
+      renderMuscleColumns();
+    }
+
+    function toggleMuscleAccordion(muscleId) {
+      collapsedMuscles[muscleId] = !collapsedMuscles[muscleId];
+      const card = document.getElementById(`muscle-card-${muscleId}`);
+      if (card) {
+        card.classList.toggle('collapsed', collapsedMuscles[muscleId]);
+      }
+    }
+
+    function buildDefaultRoutine() {
+      routineData = {};
+      DAYS.forEach(d => { routineData[d.id] = {}; });
+
+      routineData['mon']['chest'] = {
+        "Flat Bench Press (Barbell / Dumbbell / Smith)": { enabled: true, sets: 4, reps: "8-10" },
+        "Incline Bench Press (Barbell / DB / Smith)": { enabled: true, sets: 4, reps: "8-10" },
+        "Cable Crossover (High-to-Low / Low-to-High)": { enabled: true, sets: 3, reps: "15" }
+      };
+      routineData['mon']['triceps'] = {
+        "Triceps Pushdown / Pulley (Straight-Bar / Rope / Rev / Single)": { enabled: true, sets: 4, reps: "12-15" },
+        "Close-Grip Bench Press": { enabled: true, sets: 3, reps: "8-10" }
+      };
+
+      routineData['tue']['back'] = {
+        "Lat Pulldown (Standard / Wide / Close / Reverse)": { enabled: true, sets: 4, reps: "10-12" },
+        "Bent-Over Row (Barbell / Dumbbell)": { enabled: true, sets: 4, reps: "8-10" },
+        "Deadlift (Conventional / Rack Pull)": { enabled: true, sets: 4, reps: "5-8" }
+      };
+      routineData['tue']['biceps'] = {
+        "Barbell Bicep Curl (Straight Bar / EZ-Bar)": { enabled: true, sets: 3, reps: "10-12" },
+        "Hammer Curl (DB / Cross-Body / Rope Cable)": { enabled: true, sets: 3, reps: "12-15" }
+      };
+    }
+
+    function onBodyTypeChanged() {
+      const type = document.getElementById('member_bodytype').value;
+      const info = SOMATOTYPE_GUIDELINES[type] || SOMATOTYPE_GUIDELINES["Mesomorph"];
+      document.getElementById('badgeTypeName').textContent = info.badge;
+      document.getElementById('bodyTypeTip').textContent = info.advice;
+      persistData();
+    }
+
+    function updateMemberBadges() {
+      const name = document.getElementById('member_name').value.trim() || 'Member';
+      document.title = `${name} - Staminizer Gym Workout Matrix`;
+
+      const parts = name.split(/\s+/).filter(Boolean);
+      const initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : name.slice(0, 2).toUpperCase();
+      const avatarEl = document.getElementById('memberAvatarInitials');
+      if (avatarEl) avatarEl.textContent = initials;
+    }
+
+    function persistData() {
+      localStorage.setItem("staminizer_routine_offline", JSON.stringify(routineData));
+      localStorage.setItem("staminizer_custom_offline", JSON.stringify(customExercises));
+
+      const memberInfo = {
+        name: document.getElementById('member_name').value,
+        age: document.getElementById('member_age').value,
+        height: document.getElementById('member_height').value,
+        weight: document.getElementById('member_weight').value,
+        bodytype: document.getElementById('member_bodytype').value,
+        goal: document.getElementById('member_goal').value
+      };
+      localStorage.setItem("staminizer_member_offline", JSON.stringify(memberInfo));
+    }
+
+    function toggleShowActiveOnly() {
+      showActiveOnly = !showActiveOnly;
+      const btn = document.getElementById('activeOnlyBtn');
+      btn.classList.toggle('on', showActiveOnly);
+      if (showActiveOnly) {
+        setAllAccordions(false);
+      }
+      renderMuscleColumns();
+    }
+
+    function renderFilterChips() {
+      const container = document.getElementById('filterChipContainer');
+      container.innerHTML = '';
+
+      let totalDayActive = 0;
+      MUSCLE_GROUPS.forEach(m => {
+        const mEx = routineData[currentDayId]?.[m.id] || {};
+        totalDayActive += Object.values(mEx).filter(x => x.enabled).length;
+      });
+
+      const allBtn = document.createElement('div');
+      allBtn.className = `filter-chip ${selectedMuscleFilter === 'all' ? 'active' : ''}`;
+      allBtn.onclick = () => {
+        selectedMuscleFilter = 'all';
+        renderFilterChips();
+        renderMuscleColumns();
+      };
+      allBtn.innerHTML = `All Body Parts <span class="chip-count">${totalDayActive}</span>`;
+      container.appendChild(allBtn);
+
+      MUSCLE_GROUPS.forEach(m => {
+        const mEx = routineData[currentDayId]?.[m.id] || {};
+        const count = Object.values(mEx).filter(x => x.enabled).length;
+
+        const chip = document.createElement('div');
+        chip.className = `filter-chip ${selectedMuscleFilter === m.id ? 'active' : ''}`;
+        chip.onclick = () => {
+          selectedMuscleFilter = m.id;
+          collapsedMuscles[m.id] = false; // Automatically open chosen muscle
+          renderFilterChips();
+          renderMuscleColumns();
+        };
+        chip.innerHTML = `${m.name} <span class="chip-count">${count}</span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    function onSearchExercises(query) {
+      searchQuery = query.toLowerCase().trim();
+      document.getElementById('clearSearchBtn').style.display = searchQuery ? 'block' : 'none';
+      if (searchQuery) {
+        setAllAccordions(false);
+      }
+      renderMuscleColumns();
+    }
+
+    function clearSearchInput() {
+      const input = document.getElementById('exerciseSearchInput');
+      input.value = '';
+      onSearchExercises('');
+    }
+
+    function renderDayTabs() {
+      const container = document.getElementById('dayTabsContainer');
+      container.innerHTML = '';
+
+      DAYS.forEach(day => {
+        const isActive = day.id === currentDayId;
+        let totalActive = 0;
+        if (routineData[day.id]) {
+          Object.keys(routineData[day.id]).forEach(mId => {
+            const list = routineData[day.id][mId] || {};
+            Object.values(list).forEach(item => {
+              if (item.enabled) totalActive++;
+            });
+          });
+        }
+
+        const btn = document.createElement('div');
+        btn.className = `day-tab ${isActive ? 'active' : ''}`;
+        btn.onclick = () => selectDay(day.id);
+        btn.innerHTML = `
+          <span class="day-tab-name">${day.name}</span>
+          <span class="day-tab-count">${totalActive > 0 ? `${totalActive} Ex.` : 'Rest'}</span>
+          ${totalActive > 0 ? '<span class="active-dot"></span>' : ''}
+        `;
+        container.appendChild(btn);
+      });
+    }
+
+    function selectDay(dayId) {
+      currentDayId = dayId;
+      syncAccordionDefaultsForDay();
+      renderDayTabs();
+      renderFilterChips();
+      renderMuscleColumns();
+      updateDayHeaderSummary();
+    }
+
+    function updateDayHeaderSummary() {
+      const dayObj = DAYS.find(d => d.id === currentDayId);
+      document.getElementById('currentDayNameLabel').textContent = dayObj.name;
+
+      const badgeContainer = document.getElementById('dayTargetBadges');
+      badgeContainer.innerHTML = '';
+
+      let dayTotalCount = 0;
+      let activeMuscles = [];
+
+      MUSCLE_GROUPS.forEach(muscle => {
+        const mExercises = routineData[currentDayId]?.[muscle.id] || {};
+        const count = Object.values(mExercises).filter(x => x.enabled).length;
+        if (count > 0) {
+          activeMuscles.push(`${muscle.name} (${count})`);
+          dayTotalCount += count;
+        }
+      });
+
+      if (activeMuscles.length === 0) {
+        badgeContainer.innerHTML = `<span style="color:#64748b; font-style:italic;">Rest Day</span>`;
+      } else {
+        activeMuscles.forEach(txt => {
+          const pill = document.createElement('span');
+          pill.className = 'badge-pill';
+          pill.textContent = txt;
+          badgeContainer.appendChild(pill);
+        });
+      }
+
+      document.getElementById('activeDayStats').textContent = `${dayTotalCount} active`;
+    }
+
+    function renderMuscleColumns() {
+      const grid = document.getElementById('muscleGroupsGrid');
+      grid.innerHTML = '';
+
+      const targetList = (selectedMuscleFilter === 'all')
+        ? MUSCLE_GROUPS
+        : MUSCLE_GROUPS.filter(m => m.id === selectedMuscleFilter);
+
+      let renderedAny = false;
+
+      targetList.forEach(muscle => {
+        const customList = customExercises[muscle.id] || [];
+        let allExercises = [...muscle.defaultExercises, ...customList];
+        const groupData = routineData[currentDayId]?.[muscle.id] || {};
+
+        if (searchQuery) {
+          allExercises = allExercises.filter(e => e.name.toLowerCase().includes(searchQuery));
+        }
+
+        if (showActiveOnly) {
+          allExercises = allExercises.filter(e => groupData[e.name]?.enabled);
+        }
+
+        if ((searchQuery || showActiveOnly) && allExercises.length === 0) {
+          return;
+        }
+
+        renderedAny = true;
+        const activeCount = Object.values(groupData).filter(item => item.enabled).length;
+        const isCollapsed = !!collapsedMuscles[muscle.id] && selectedMuscleFilter === 'all' && !searchQuery && !showActiveOnly;
+
+        const card = document.createElement('div');
+        card.id = `muscle-card-${muscle.id}`;
+        card.className = `muscle-card ${activeCount > 0 ? 'has-active' : ''} ${isCollapsed ? 'collapsed' : ''}`;
+
+        let cardHtml = `
+          <div class="muscle-card-header" onclick="toggleMuscleAccordion('${muscle.id}')">
+            <div class="muscle-title-wrap">
+              <div class="muscle-icon-box">
+                <svg class="icon" viewBox="0 0 24 24"><path d="${muscle.svgPath}"/></svg>
+              </div>
+              <div>
+                <div class="muscle-name">${muscle.name}</div>
+                <div class="muscle-subtitle">${allExercises.length} exercises available</div>
+              </div>
+            </div>
+            <div class="muscle-header-right">
+              <span class="active-count-pill">${activeCount} ON</span>
+              <svg class="icon chevron-icon" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+            </div>
+          </div>
+
+          <div class="muscle-card-body">
+            <div class="exercise-list">
+        `;
+
+        allExercises.forEach((ex, idx) => {
+          const exState = groupData[ex.name] || {
+            enabled: false,
+            sets: ex.sets || 3,
+            reps: ex.reps || "10-12"
+          };
+          const isChecked = exState.enabled;
+
+          cardHtml += `
+            <div class="exercise-row ${isChecked ? 'enabled' : ''}">
+              <div class="exercise-row-top">
+                <label class="exercise-label" for="toggle-${muscle.id}-${idx}">
+                  ${ex.name}
+                </label>
+                <label class="switch">
+                  <input type="checkbox" id="toggle-${muscle.id}-${idx}" ${isChecked ? 'checked' : ''} onchange="toggleExercise('${muscle.id}', '${escapeQuotes(ex.name)}', this.checked)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="exercise-controls ${isChecked ? '' : 'hidden-controls'}">
+                <div class="input-group" style="max-width:105px;">
+                  <span class="input-label">Sets:</span>
+                  <input type="number" min="1" max="20" class="input-field input-sets" value="${exState.sets}" onchange="updateExerciseData('${muscle.id}', '${escapeQuotes(ex.name)}', 'sets', this.value)">
+                </div>
+                <div class="input-group">
+                  <span class="input-label">Reps:</span>
+                  <input type="text" class="input-field" value="${exState.reps}" placeholder="10-12" onchange="updateExerciseData('${muscle.id}', '${escapeQuotes(ex.name)}', 'reps', this.value)">
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        cardHtml += `
+            </div>
+            <div class="custom-add-wrap">
+              <button onclick="toggleCustomExerciseForm('${muscle.id}')" class="btn-add-custom-bottom">
+                <svg class="icon" style="width:12px; height:12px;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Add Custom ${muscle.name} Exercise
+              </button>
+              <div class="custom-add-form" id="custom-form-${muscle.id}">
+                <input type="text" id="custom-input-${muscle.id}" class="input-field" placeholder="New exercise name..." onkeydown="if(event.key==='Enter') saveCustomExercise('${muscle.id}')">
+                <button class="btn btn-primary" style="padding:0.35rem 0.65rem;" onclick="saveCustomExercise('${muscle.id}')">Add</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        card.innerHTML = cardHtml;
+        grid.appendChild(card);
+      });
+
+      if (!renderedAny) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; color: #94a3b8; font-size: 0.82rem;">
+            No exercises match your current filter.
+            <div style="margin-top:0.6rem;">
+              <button class="btn btn-secondary" onclick="showActiveOnly=false; document.getElementById('activeOnlyBtn').classList.remove('on'); clearSearchInput();">Reset Filters</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function toggleCustomExerciseForm(muscleId) {
+      const form = document.getElementById(`custom-form-${muscleId}`);
+      if (!form) return;
+      form.classList.toggle('show');
+      if (form.classList.contains('show')) {
+        const inp = document.getElementById(`custom-input-${muscleId}`);
+        if (inp) inp.focus();
+      }
+    }
+
+    function saveCustomExercise(muscleId) {
+      const inp = document.getElementById(`custom-input-${muscleId}`);
+      if (!inp || !inp.value.trim()) return;
+
+      const trimmed = inp.value.trim();
+      if (!customExercises[muscleId]) customExercises[muscleId] = [];
+
+      const exists = customExercises[muscleId].some(e => e.name.toLowerCase() === trimmed.toLowerCase());
+      if (exists) {
+        showToast("Exercise already exists!");
+        return;
+      }
+
+      customExercises[muscleId].push({ name: trimmed, sets: 3, reps: "10-12" });
+
+      if (!routineData[currentDayId]) routineData[currentDayId] = {};
+      if (!routineData[currentDayId][muscleId]) routineData[currentDayId][muscleId] = {};
+      routineData[currentDayId][muscleId][trimmed] = { enabled: true, sets: 3, reps: "10-12" };
+
+      collapsedMuscles[muscleId] = false;
+      persistData();
+      renderMuscleColumns();
+      renderFilterChips();
+      renderDayTabs();
+      updateDayHeaderSummary();
+      showToast(`Added: ${trimmed}`);
+    }
+
+    function toggleExercise(muscleId, exName, isChecked) {
+      if (!routineData[currentDayId]) routineData[currentDayId] = {};
+      if (!routineData[currentDayId][muscleId]) routineData[currentDayId][muscleId] = {};
+
+      const current = routineData[currentDayId][muscleId][exName] || { sets: 3, reps: "10-12" };
+      current.enabled = isChecked;
+      routineData[currentDayId][muscleId][exName] = current;
+
+      collapsedMuscles[muscleId] = false;
+      persistData();
+      renderDayTabs();
+      renderFilterChips();
+      renderMuscleColumns();
+      updateDayHeaderSummary();
+      showToast(isChecked ? `Added: ${exName}` : `Removed: ${exName}`);
+    }
+
+    function updateExerciseData(muscleId, exName, field, value) {
+      if (!routineData[currentDayId]?.[muscleId]?.[exName]) return;
+      routineData[currentDayId][muscleId][exName][field] = value;
+      persistData();
+    }
+
+    function clearCurrentDay() {
+      if (!routineData[currentDayId]) return;
+      Object.keys(routineData[currentDayId]).forEach(mId => {
+        routineData[currentDayId][mId] = {};
+      });
+      persistData();
+      renderDayTabs();
+      renderFilterChips();
+      renderMuscleColumns();
+      updateDayHeaderSummary();
+      showToast(`Reset ${DAYS.find(d => d.id === currentDayId).name}`);
+    }
+
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2600);
+    }
+
+    // Primary 1-Tap Direct Share Action (Strictly shares ONLY the .JPG file, never plain text)
+    async function shareRoutineJPG() {
+      const { canvas, memberName } = buildWorkoutCanvas();
+      const cleanName = memberName.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `staminzer_Workout_${cleanName}.jpg`;
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+      // 1. Check if running inside a Native Android APK WebView Bridge that supports Base64 image sharing
+      if (window.Android && typeof window.Android.shareImage === 'function') {
+        window.Android.shareImage(dataUrl, fileName);
+        return;
+      }
+
+      // 2. Standard Web Share API Level 2 (Shares actual .JPG binary file to WhatsApp)
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        if (blob && window.File && navigator.share) {
+          const file = new File([blob], fileName, { type: 'image/jpeg' });
+          // CRITICAL: Pass ONLY `files: [file]` without `text` or `url`!
+          // If `text` is included alongside `files`, WhatsApp on Android often ignores the image and only pastes the text!
+          if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file]
+            });
+            showToast("JPG Image sent to Share sheet!");
+            return;
+          }
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+
+      // 3. If the APK WebView blocks navigator.share({files}), open the JPG Preview Modal
+      openStaminzerExportModal();
+    }
+
+    // Explicit trigger from inside the modal to test native file sharing or guide user
+    async function forceShareImageFileOnly() {
+      const { canvas, memberName } = buildWorkoutCanvas();
+      const cleanName = memberName.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `staminzer_Workout_${cleanName}.jpg`;
+
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        if (blob && window.File && navigator.share) {
+          const file = new File([blob], fileName, { type: 'image/jpeg' });
+          await navigator.share({ files: [file] });
+          showToast("JPG Image shared!");
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+
+      showToast("Your APK WebView blocks file sharing. Long-press the card image below and tap 'Share image'!");
+    }
+
+    function shareViaWhatsAppDirect() {
+      const text = buildWorkoutTextSummary();
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    // Build Formatted HTML for Preview & Print (Updated with Member's Name)
+    function generateWeeklySummaryHTML() {
+      const memberName = document.getElementById('member_name').value || 'Member';
+      const age = document.getElementById('member_age').value || '-';
+      const height = document.getElementById('member_height').value || '-';
+      const weight = document.getElementById('member_weight').value || '-';
+      const bodytype = document.getElementById('member_bodytype').value || 'Mesomorph';
+      const goal = document.getElementById('member_goal').value || 'Fitness';
+
+      let html = `
+        <div style="font-family: inherit;">
+          <div style="border-bottom: 2px solid #e11d48; padding-bottom: 8px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:8px;">
+            <div>
+              <h2 style="font-size: 1.25rem; font-weight: 900; text-transform: uppercase; color: #fff; line-height: 1;">STAMIN<span style="color:#f43f5e;">IZER</span> WORKOUT MATRIX</h2>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 3px;">Nazrul Ashrampara, Near Maya Nursing Home, Siliguri 734001</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="color: #fda4af; font-family: monospace; font-weight: 700; font-size: 0.85rem;">TEL: 6296306487</div>
+              <div style="font-size: 0.68rem; color: #cbd5e1;">Folder: staminzer/ • ${new Date().toLocaleDateString()}</div>
+            </div>
+          </div>
+
+          <div style="background: #090e17; border: 1px solid #1e293b; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; font-size: 0.75rem;">
+            <div><span style="color:#64748b; font-weight:700;">MEMBER'S NAME:</span> <b style="color:#fff;">${memberName}</b></div>
+            <div><span style="color:#64748b; font-weight:700;">AGE:</span> <b style="color:#fff;">${age} yrs</b></div>
+            <div><span style="color:#64748b; font-weight:700;">HEIGHT:</span> <b style="color:#fff;">${height}</b></div>
+            <div><span style="color:#64748b; font-weight:700;">WEIGHT:</span> <b style="color:#fff;">${weight}</b></div>
+            <div><span style="color:#64748b; font-weight:700;">BODY TYPE:</span> <b style="color:#38bdf8;">${bodytype}</b></div>
+            <div><span style="color:#64748b; font-weight:700;">GOAL:</span> <b style="color:#fda4af;">${goal}</b></div>
+          </div>
+      `;
+
+      DAYS.forEach(day => {
+        let rows = '';
+        let hasEx = false;
+
+        MUSCLE_GROUPS.forEach(m => {
+          const list = routineData[day.id]?.[m.id] || {};
+          Object.keys(list).forEach(name => {
+            const item = list[name];
+            if (item && item.enabled) {
+              hasEx = true;
+              rows += `
+                <tr style="border-bottom: 1px solid #1e293b; font-size: 0.74rem;">
+                  <td style="padding: 5px 8px; font-weight: 700; color: #fda4af; text-transform: uppercase;">${m.name}</td>
+                  <td style="padding: 5px 8px; color: #ffffff;">${name}</td>
+                  <td style="padding: 5px 8px; text-align: center; color: #fbbf24; font-weight: 700;">${item.sets}</td>
+                  <td style="padding: 5px 8px; text-align: center; color: #e2e8f0; font-family: monospace;">${item.reps}</td>
+                </tr>
+              `;
+            }
+          });
+        });
+
+        html += `
+          <div class="print-card-box" style="background: #090e17; border: 1px solid #1e293b; border-radius: 8px; margin-bottom: 10px; overflow: hidden;">
+            <div style="background: #111827; padding: 6px 10px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase; color: #fff;">● ${day.name}</span>
+              <span style="font-size: 0.68rem; font-weight: 700; color: ${hasEx ? '#34d399' : '#64748b'}; text-transform: uppercase;">
+                ${hasEx ? 'Workout Scheduled' : 'Rest & Recovery'}
+              </span>
+            </div>
+            ${
+              hasEx
+              ? `<table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: #0d131f; font-size: 0.66rem; color: #94a3b8; text-transform: uppercase;">
+                      <th style="padding: 4px 8px; text-align: left; width: 130px;">Muscle</th>
+                      <th style="padding: 4px 8px; text-align: left;">Exercise</th>
+                      <th style="padding: 4px 8px; text-align: center; width: 60px;">Sets</th>
+                      <th style="padding: 4px 8px; text-align: center; width: 85px;">Reps</th>
+                    </tr>
+                  </thead>
+                  <tbody>${rows}</tbody>
+                </table>`
+              : `<div style="padding: 8px; text-align: center; font-size: 0.72rem; color: #64748b; font-style: italic;">No exercises scheduled. Hydrate & recover.</div>`
+            }
+          </div>
+        `;
+      });
+
+      html += `
+          <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; font-size: 0.7rem; color: #64748b; flex-wrap: wrap; gap: 6px;">
+            <span>Coach Verification: ____________________</span>
+            <span>Helpline: 6296306487</span>
+            <span>Staminizer Folder: staminzer/</span>
+          </div>
+        </div>
+      `;
+
+      return html;
+    }
+
+    // 100% OFFLINE NATIVE PRINT / PDF
+    function triggerNativePrint() {
+      updateMemberBadges();
+      const container = document.getElementById('printContainer');
+      container.innerHTML = generateWeeklySummaryHTML();
+      window.print();
+    }
+
+    // Build Canvas for JPG Generation (With "MEMBER'S NAME" & staminzer/ stamp)
+    function buildWorkoutCanvas() {
+      const memberName = document.getElementById('member_name').value.trim() || 'Member';
+      const age = document.getElementById('member_age').value || '-';
+      const height = document.getElementById('member_height').value || '-';
+      const weight = document.getElementById('member_weight').value || '-';
+      const bodytype = document.getElementById('member_bodytype').value || 'Mesomorph';
+      const goal = document.getElementById('member_goal').value || 'Fitness';
+
+      const canvasWidth = 840;
+      let totalHeight = 40;
+      totalHeight += 70;
+      totalHeight += 50;
+      totalHeight += 20;
+
+      DAYS.forEach(day => {
+        totalHeight += 32;
+        let activeExCount = 0;
+        MUSCLE_GROUPS.forEach(m => {
+          const list = routineData[day.id]?.[m.id] || {};
+          Object.keys(list).forEach(name => {
+            if (list[name]?.enabled) activeExCount++;
+          });
+        });
+
+        if (activeExCount > 0) {
+          totalHeight += 24;
+          totalHeight += (activeExCount * 26);
+        } else {
+          totalHeight += 28;
+        }
+        totalHeight += 12;
+      });
+
+      totalHeight += 50;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasWidth;
+      canvas.height = totalHeight;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0b0f17';
+      ctx.fillRect(0, 0, canvasWidth, totalHeight);
+
+      let y = 30;
+      const leftMargin = 35;
+      const rightMargin = canvasWidth - 35;
+      const contentWidth = rightMargin - leftMargin;
+
+      // Header Brand
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('STAMIN', leftMargin, y);
+      const staminWidth = ctx.measureText('STAMIN').width;
+      ctx.fillStyle = '#f43f5e';
+      ctx.fillText('IZER', leftMargin + staminWidth, y);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(' WORKOUT MATRIX', leftMargin + staminWidth + ctx.measureText('IZER').width, y);
+
+      // Helpline on the right
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fda4af';
+      ctx.font = 'bold 15px monospace';
+      ctx.fillText('TEL: 6296306487', rightMargin, y - 5);
+      ctx.fillStyle = '#34d399';
+      ctx.font = '11px monospace';
+      ctx.fillText('staminzer/ • ' + new Date().toLocaleDateString(), rightMargin, y + 14);
+
+      // Subtitle
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('Nazrul Ashrampara, Near Maya Nursing Home, Opposite Sunhill Portico, Siliguri 734001', leftMargin, y + 18);
+
+      y += 28;
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(leftMargin, y);
+      ctx.lineTo(rightMargin, y);
+      ctx.stroke();
+
+      y += 14;
+
+      // Member Bio Card
+      ctx.fillStyle = '#111827';
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      roundRect(ctx, leftMargin, y, contentWidth, 42, 6, true, true);
+
+      const colStep = contentWidth / 6;
+
+      // Col 1: Member's Name
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText("MEMBER'S NAME", leftMargin + 10, y + 16);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(memberName, leftMargin + 10, y + 32);
+
+      // Col 2: Age
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('AGE', leftMargin + colStep, y + 16);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(age + ' yrs', leftMargin + colStep, y + 32);
+
+      // Col 3: Height
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('HEIGHT', leftMargin + (colStep * 1.8), y + 16);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(height, leftMargin + (colStep * 1.8), y + 32);
+
+      // Col 4: Weight
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('WEIGHT', leftMargin + (colStep * 2.7), y + 16);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(weight, leftMargin + (colStep * 2.7), y + 32);
+
+      // Col 5: Body Type
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('BODY TYPE', leftMargin + (colStep * 3.6), y + 16);
+      ctx.fillStyle = '#38bdf8'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(bodytype, leftMargin + (colStep * 3.6), y + 32);
+
+      // Col 6: Goal
+      ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px sans-serif'; ctx.fillText('PRIMARY GOAL', leftMargin + (colStep * 4.6), y + 16);
+      ctx.fillStyle = '#fda4af'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(goal, leftMargin + (colStep * 4.6), y + 32);
+
+      y += 56;
+
+      // Draw Each Day Table
+      DAYS.forEach(day => {
+        let activeExList = [];
+        MUSCLE_GROUPS.forEach(m => {
+          const list = routineData[day.id]?.[m.id] || {};
+          Object.keys(list).forEach(name => {
+            if (list[name]?.enabled) {
+              activeExList.push({
+                muscle: m.name,
+                name: name,
+                sets: list[name].sets,
+                reps: list[name].reps
+              });
+            }
+          });
+        });
+
+        const hasEx = activeExList.length > 0;
+        const dayBoxHeight = hasEx ? (30 + 22 + (activeExList.length * 24)) : 52;
+
+        ctx.fillStyle = '#090e17';
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        roundRect(ctx, leftMargin, y, contentWidth, dayBoxHeight, 6, true, true);
+
+        ctx.fillStyle = '#111827';
+        roundRect(ctx, leftMargin, y, contentWidth, 26, { tl: 6, tr: 6, br: 0, bl: 0 }, true, false);
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(leftMargin + 14, y + 13, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(day.name.toUpperCase(), leftMargin + 25, y + 17);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = hasEx ? '#34d399' : '#64748b';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText(hasEx ? 'WORKOUT SCHEDULED' : 'REST & RECOVERY', rightMargin - 12, y + 17);
+        ctx.textAlign = 'left';
+
+        let innerY = y + 26;
+
+        if (hasEx) {
+          ctx.fillStyle = '#0d131f';
+          ctx.fillRect(leftMargin, innerY, contentWidth, 20);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillText('MUSCLE', leftMargin + 10, innerY + 14);
+          ctx.fillText('EXERCISE', leftMargin + 150, innerY + 14);
+          ctx.textAlign = 'center';
+          ctx.fillText('SETS', rightMargin - 120, innerY + 14);
+          ctx.fillText('REPS', rightMargin - 45, innerY + 14);
+          ctx.textAlign = 'left';
+
+          innerY += 20;
+
+          activeExList.forEach((item, i) => {
+            ctx.fillStyle = (i % 2 === 0) ? '#090e17' : '#0c121e';
+            ctx.fillRect(leftMargin, innerY, contentWidth, 24);
+
+            ctx.fillStyle = '#fda4af';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText(item.muscle.toUpperCase(), leftMargin + 10, innerY + 16);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '11px sans-serif';
+            ctx.fillText(item.name, leftMargin + 150, innerY + 16);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(item.sets.toString(), rightMargin - 120, innerY + 16);
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '11px monospace';
+            ctx.fillText(item.reps.toString(), rightMargin - 45, innerY + 16);
+            ctx.textAlign = 'left';
+
+            innerY += 24;
+          });
+        } else {
+          ctx.fillStyle = '#64748b';
+          ctx.font = 'italic 11px sans-serif';
+          ctx.fillText('No exercises scheduled for this day. Hydrate & recover.', leftMargin + 16, innerY + 17);
+        }
+
+        y += dayBoxHeight + 10;
+      });
+
+      y += 8;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(leftMargin, y);
+      ctx.lineTo(rightMargin, y);
+      ctx.stroke();
+
+      y += 18;
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('Coach Verification: _______________________', leftMargin, y);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('Helpline: 6296306487 | Folder: staminzer/', canvasWidth / 2, y);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('Consistency • Progressive Overload', rightMargin, y);
+
+      return { canvas, memberName };
+    }
+
+    // Enhanced Multi-Fallback JPG Download (Supports Blob URLs, Android Bridges & Browser Downloads)
+    async function downloadNativeJPG() {
+      const { canvas, memberName } = buildWorkoutCanvas();
+      const cleanName = memberName.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `staminzer_Workout_${cleanName}.jpg`;
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+
+      if (window.Android && typeof window.Android.saveImage === 'function') {
+        window.Android.saveImage(dataUrl, fileName);
+        showToast(`Saved ${fileName} to Gallery!`);
+        return;
+      }
+
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        if (blob) {
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 6000);
+          showToast(`Downloading ${fileName}...`);
+          return;
+        }
+      } catch (e) {
+        console.error("Blob download error:", e);
+      }
+
+      openStaminzerExportModal();
+      showToast("Long-press routine card image to Save or Share!");
+    }
+
+    // Build Plain-Text Routine Summary for WhatsApp / SMS Sharing
+    function buildWorkoutTextSummary() {
+      const memberName = document.getElementById('member_name').value.trim() || 'Member';
+      const age = document.getElementById('member_age').value || '-';
+      const height = document.getElementById('member_height').value || '-';
+      const weight = document.getElementById('member_weight').value || '-';
+      const bodytype = document.getElementById('member_bodytype').value || 'Mesomorph';
+      const goal = document.getElementById('member_goal').value || 'Fitness';
+
+      let lines = [];
+      lines.push(`🏋️ *STAMINIZER WORKOUT MATRIX*`);
+      lines.push(`📍 Nazrul Ashrampara, Near Maya Nursing Home, Siliguri 734001`);
+      lines.push(`📞 Helpline: 6296306487 | Folder: staminzer/`);
+      lines.push(`────────────────────`);
+      lines.push(`👤 *Member's Name:* ${memberName}`);
+      lines.push(`📊 *Bio:* ${age} yrs | ${height} | ${weight}`);
+      lines.push(`🧬 *Body Type:* ${bodytype}`);
+      lines.push(`🎯 *Goal:* ${goal}`);
+      lines.push(`────────────────────`);
+
+      DAYS.forEach(day => {
+        let dayEx = [];
+        MUSCLE_GROUPS.forEach(m => {
+          const list = routineData[day.id]?.[m.id] || {};
+          Object.keys(list).forEach(name => {
+            if (list[name]?.enabled) {
+              dayEx.push(`  • [${m.name}] ${name} — *${list[name].sets} sets × ${list[name].reps}*`);
+            }
+          });
+        });
+
+        if (dayEx.length > 0) {
+          lines.push(`\n📅 *${day.name.toUpperCase()}*`);
+          lines.push(...dayEx);
+        } else {
+          lines.push(`\n📅 *${day.name.toUpperCase()}:* Rest & Recovery`);
+        }
+      });
+
+      lines.push(`\n────────────────────`);
+      lines.push(`⚡ *Staminizer Gym* • Consistency & Progressive Overload`);
+      return lines.join('\n');
+    }
+
+    async function shareWorkoutTextSummary() {
+      const text = buildWorkoutTextSummary();
+      const memberName = document.getElementById('member_name').value.trim() || 'Member';
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `Staminizer Workout - ${memberName}`,
+            text: text
+          });
+          showToast("Shared workout text summary!");
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast("Routine copied! Paste directly into WhatsApp.");
+      } catch (e) {
+        showToast("Could not copy text.");
+      }
+      document.body.removeChild(ta);
+    }
+
+    // Modal Control Helpers
+    function openStaminzerExportModal() {
+      const memberName = document.getElementById('member_name').value.trim() || 'Member';
+      document.getElementById('exportMemberNameLabel').textContent = memberName;
+      const cleanName = memberName.replace(/[^a-zA-Z0-9]/g, '_');
+      document.getElementById('previewJpgFileName').textContent = `staminzer/Staminizer_Workout_${cleanName}.jpg`;
+
+      try {
+        const { canvas } = buildWorkoutCanvas();
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+        document.getElementById('liveGeneratedCardImg').src = dataUrl;
+      } catch (e) {}
+
+      document.getElementById('staminzerExportModal').classList.add('show');
+    }
+
+    function closeStaminzerExportModal() {
+      document.getElementById('staminzerExportModal').classList.remove('show');
+    }
+
+    // Canvas Rounded Rectangle helper
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      if (typeof radius === 'undefined') radius = 5;
+      if (typeof radius === 'number') {
+        radius = { tl: radius, tr: radius, br: radius, bl: radius };
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + radius.tl, y);
+      ctx.lineTo(x + width - radius.tr, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+      ctx.lineTo(x + width, y + height - radius.br);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+      ctx.lineTo(x + radius.bl, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+      ctx.lineTo(x, y + radius.tl);
+      ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    window.onload = function() {
+      initApp();
+    };
+  </script>
 </body>
 </html>
